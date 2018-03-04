@@ -165,12 +165,6 @@ func initMap(start rune, finish rune) map[rune]int {
     return newMap
 }
 
-func printMaps(m map[rune]int) {
-    for k, v := range m{
-        fmt.Printf("key=%s   val=%d\n", k, v)
-    }
-}
-
 func readLines(path string) (lines []string, err error) {
     buffer, err := ioutil.ReadFile(path)
     if err != nil {
@@ -181,4 +175,3 @@ func readLines(path string) (lines []string, err error) {
 
     return lines, err
 }
-
