@@ -17,9 +17,9 @@ import (
    )
 
    type gameState struct {
-       suspects map[rune]uint
-       weapons map[rune]uint
-       rooms map[rune]uint
+       suspects map[rune]int
+       weapons map[rune]int
+       rooms map[rune]int
    }
 
 func main() {
@@ -75,12 +75,22 @@ func (s* gameState)deduction() {
       string(findNotSeen(s.rooms)))
 }
 
-func findNotSeen(m map[rune]uint) (key rune){
+func findNotSeen(m map[rune]int) (key rune){
     for k, v := range m {
         if v == NOT_SEEN {
             key = k
             return
         }
+    }
+    count := 0
+    for k, v := range m {
+        if v == NOT_ASKED {
+                key = k
+                count++
+        }
+    }
+    if count == 1 {
+        return key
     }
     return '?'
 }
@@ -94,15 +104,29 @@ func (s* gameState)process(suggestions []string) {
         suspect = rune(suggestions[i][0])
         weapon = rune(suggestions[i][2])
         room = rune(suggestions[i][4])
+
+
         suggestion := strings.Fields(suggestions[i][6:])
 
         notSeenFlag := true
         for _, v := range suggestion {
-            if v != "-"  {
+            if v == "*" {
                 notSeenFlag = false
-                break
-            } else if v == "*" {
-                
+                if s.suspects[suspect] == NOT_ASKED  {
+                    if (s.weapons[weapon] != NOT_ASKED) &&
+                        (s.rooms[room] != NOT_ASKED) {
+                            s.update(suspect, SEEN)
+                } else if s.weapons[weapon] == NOT_ASKED {
+                    if s.rooms[room] != NOT_ASKED {
+                            s.update(weapon, SEEN)
+                        }
+                    }
+                } else if s.rooms[room] == NOT_ASKED {
+                    s.update(room, SEEN)
+                }
+            } else if v != "-"{
+                notSeenFlag = false
+                s.update(rune(v[0]), SEEN)
             }
         }
         if notSeenFlag {
@@ -116,7 +140,7 @@ func (s* gameState)process(suggestions []string) {
 
 }
 
-func (s* gameState)update(card rune, state uint) {
+func (s* gameState)update(card rune, state int) {
     switch {
     case card < 'G':
         s.suspects[card] = state
@@ -133,15 +157,15 @@ func (s* gameState)init() {
     s.rooms = initMap('M', 'U')
 }
 
-func initMap(start rune, finish rune) map[rune]uint {
-    newMap := map[rune]uint{}
+func initMap(start rune, finish rune) map[rune]int {
+    newMap := map[rune]int{}
     for i := start; i < finish + 1; i++ {
         newMap[rune(i)] = NOT_ASKED
     }
     return newMap
 }
 
-func printMaps(m map[rune]uint) {
+func printMaps(m map[rune]int) {
     for k, v := range m{
         fmt.Printf("key=%s   val=%d\n", k, v)
     }
