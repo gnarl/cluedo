@@ -8,6 +8,8 @@ import (
     "strconv"
 )
 
+//TODO do I need to use runes at all?
+
    const (
        NOT_ASKED = iota
        SEEN
@@ -62,7 +64,25 @@ func main() {
     }
 
     state.process(suggestions)
+    state.deduction()
 
+}
+
+func (s* gameState)deduction() {
+  fmt.Printf("%s%s%s\n",
+      string(findNotSeen(s.suspects)),
+      string(findNotSeen(s.weapons)),
+      string(findNotSeen(s.rooms)))
+}
+
+func findNotSeen(m map[rune]uint) (key rune){
+    for k, v := range m {
+        if v == NOT_SEEN {
+            key = k
+            return
+        }
+    }
+    return '?'
 }
 
 func (s* gameState)process(suggestions []string) {
@@ -72,20 +92,23 @@ func (s* gameState)process(suggestions []string) {
 
     for i := 0; i < len(suggestions); i++ {
         suspect = rune(suggestions[i][0])
-        weapon = rune(suggestions[i][1])
-        room = rune(suggestions[i][2])
-        suggestion := suggestions[i][2:]
+        weapon = rune(suggestions[i][2])
+        room = rune(suggestions[i][4])
+        suggestion := strings.Fields(suggestions[i][6:])
 
-        //check for not seen
         notSeenFlag := true
-        for i:=0; i < len(suggestion); i++ {
-            if suggestion[i] != '-'  {
+        for _, v := range suggestion {
+            if v != "-"  {
                 notSeenFlag = false
                 break
+            } else if v == "*" {
+                
             }
         }
         if notSeenFlag {
-            fmt.Printf("%s %s %s", suspect, weapon, room)
+            s.update(suspect, NOT_SEEN)
+            s.update(weapon, NOT_SEEN)
+            s.update(room, NOT_SEEN)
         }
     }
 
