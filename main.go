@@ -8,8 +8,6 @@ import (
     "strconv"
 )
 
-//TODO do I need to use runes at all?
-
    const (
        NOT_ASKED = iota
        SEEN
@@ -26,22 +24,6 @@ func main() {
 
     var state gameState
     state.init()
-
-    // 3 cards placed in packet
-    // 18 cards remaining to be dealt. up to 4 players. 2 players have extra cards
-
-
-    // first input is n of suggestions
-    // five cards you are dealt 'A' .. 'U'
-    // remaining  lines contain one suggestion per line
-    // 1
-    // B I P C F
-    // A G M - - -
-    // 00000000000000
-    // person, weapon, room, response1(player-to-right), response2, response3(upto)
-    // '-' no evidence
-    // 'S' you see 'S'
-    // '*' some evidence was shown
 
     inputPath := os.Args[1]
     fmt.Printf("reading %s \n", inputPath)
@@ -78,10 +60,10 @@ func (s* gameState)deduction() {
 func findNotSeen(m map[rune]int) (key rune){
     for k, v := range m {
         if v == NOT_SEEN {
-            key = k
-            return
+            return k
         }
     }
+
     count := 0
     for k, v := range m {
         if v == NOT_ASKED {
@@ -92,6 +74,7 @@ func findNotSeen(m map[rune]int) (key rune){
     if count == 1 {
         return key
     }
+
     return '?'
 }
 
